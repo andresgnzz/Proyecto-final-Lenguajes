@@ -64,6 +64,17 @@ void modificaAtributo(FILE *f, Entidad *entAct, long direntAct);
 void consultaAtributo(FILE *f, Entidad entAct);
 void pideNombAtr(cadena nombAtr);
 
+//Bloques
+
+int opcBlq();
+void menuBloques(FILE *f, Entidad entAct, long direntAct);
+void insertaBloque(FILE *f);
+long eliminaBloque(FILE *f);
+void* leeBloque(FILE *f, long dir);
+long escribeBloque(FILE *f, void* b);
+long buscaBloque(FILE *f, Entidad entAct, void* b);
+long comparaBloques(FILE *f, void* b1, void* b2);
+
 
 
 int main()
@@ -800,3 +811,113 @@ void pideNombAtr(cadena nombAtr)
     scanf("%s", nombAtr);
     printf("\n");
 }
+
+
+
+
+//Funciones de Bloques
+
+/*
+int opcBlq()
+{
+    int opc;
+
+    printf("\n-------- MENU DATOS --------\n");
+    printf("1. Nuevo Registro\n");
+    printf("2. Consultar Registro\n");
+    printf("3. Eliminar Registro\n");
+    printf("4. Modificar Registro\n");
+    printf("5. Menu Anterior\n");
+    printf("----------------------------------\n");
+
+    scanf("%d", &opc);
+
+    return opc;
+}
+
+void menuBloques(FILE *f, Entidad entAct, long direntAct)
+{
+    int opc;
+
+    do {
+        opc=opcAtr();
+
+        switch(opc)
+        {
+            case 1:
+                //insertaBloque
+                break;
+            case 2:
+                //consultaBloque
+                break;
+            case 3:
+                //eliminaBloque
+                break;
+            case 4:
+                //modificaBloque
+                break;
+            case 5:
+                printf("\nRegresando a menu de entidades...\n ");
+                menuEntidades(f);
+                break;
+            default:
+                printf("Ingresa una opcion del 1 al 5 ");
+        }
+    }while(opc != 5);
+}
+
+void insertaBloque(FILE *f)
+{
+
+}
+
+long eliminaBloque(FILE *f)
+{
+
+}
+
+void* leeBloque(FILE *f, long dir)
+{
+    long tamBloque;
+    void* b = malloc(tamBloque);
+
+    fseek(f, dir, SEEK_SET);
+    fread(b, tamBloque, 1, f);
+
+    return b;
+}
+
+long escribeBloque(FILE *f, void* b)
+{
+    long pos, tamBloque;
+
+    fseek(f, 0, SEEK_END);
+    pos = ftell(f);
+    fwrite(b, tamBloque, 1, f);
+
+    return pos;
+}
+
+long buscaBloque(FILE *f, Entidad entAct, void* b)
+{
+    void* data;
+    long cab;
+
+    cab = entAct.data;
+
+    while (cab != -1)
+    {
+        data = leeBloque(f, cab);
+
+        if(comparaBloques(f, data, b) == 0)
+        {
+            free(data);
+            return cab;
+        }
+
+        cab = *((long *) data);
+        free(data);
+    }
+    return -1;
+}
+*/
