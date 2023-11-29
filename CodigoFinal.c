@@ -28,6 +28,7 @@ void abrirDiccionario(FILE *f);
 void cerrarDiccionario(FILE *f);
 
 //Entidades
+
 void menuEntidades(FILE *f);
 void altaEntidad(FILE *f);
 Entidad capturaEntidad();
@@ -46,7 +47,6 @@ void rescribeCabEntidades(FILE *f,long dir);
 void pideNomEnt(cadena nombEnt);
 
 //Atributos
-//Todas las funciones necesitan como parametro la entidad activa (entAct) y la direccion de la entidad activa (direntAct)
 
 void menuAtributos(FILE *f, Entidad entAct, long direntAct);
 int opcAtr();
