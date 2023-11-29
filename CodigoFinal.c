@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 typedef char cadena[30];
 
@@ -68,12 +69,18 @@ void pideNombAtr(cadena nombAtr);
 
 int opcBlq();
 void menuBloques(FILE *f, Entidad entAct, long direntAct);
-void insertaBloque(FILE *f);
+bool existeISKP(FILE *f, Entidad entAct);
+void cargaAtributos(FILE *f, Entidad entAct, long direntAct, void* arrAtr[]);
+void* capturaBloque();
+void insertaBloque(FILE *f, Entidad entAct, long direntAct, void* b, long dir);
 long eliminaBloque(FILE *f);
 void* leeBloque(FILE *f, long dir);
 long escribeBloque(FILE *f, void* b);
 long buscaBloque(FILE *f, Entidad entAct, void* b);
 long comparaBloques(FILE *f, void* b1, void* b2);
+void modificaBloque(FILE *f, Entidad entAct);
+void reescribeBloque(FILE *f, Entidad entAct, void* b, long dir);
+long existeBloqueDif(FILE *f, Entidad entAct, void* b, void* bNuevo);
 
 
 
@@ -213,6 +220,13 @@ void menuEntidades(FILE *f)
                 printf("\nApuntador atr: %ld", entAct.atr);
                 printf("\nDireccion entAct: %ld", direntAct);
                 menuAtributos(f, entAct, direntAct);
+            case 6:
+                seleccionaTabla(f, &entAct, &direntAct);
+                if(existeISKP(f, entAct) == true)
+                {
+                    menuBloques(f, entAct, direntAct);
+                }
+                break;
             case 7:
                 menuPrincipal(f);
             default:
@@ -817,7 +831,38 @@ void pideNombAtr(cadena nombAtr)
 
 //Funciones de Bloques
 
-/*
+bool existeISKP(FILE *f, Entidad entAct)
+{
+    int cont = 0;
+    long cab = entAct.atr;
+    Atributo atr;
+
+    while (cab != -1)
+    {
+        atr = leeAtributo(f, cab);
+        printf("%s\n", atr.nombre);
+
+        if(atr.iskp == 'S')
+            cont++;
+
+        cab = atr.sig;
+    }
+
+    if(cont == 1)
+        return true;
+    else if(cont > 1)
+        printf("\nError. Existe mas de una clave\n");
+    else
+        printf("\nError. No existe clave.\n");
+
+    return false;
+}
+
+void cargaAtributos(FILE *f, Entidad entAct, long direntAct, void* arrAtr[])
+{
+
+}
+
 int opcBlq()
 {
     int opc;
@@ -838,9 +883,9 @@ int opcBlq()
 void menuBloques(FILE *f, Entidad entAct, long direntAct)
 {
     int opc;
-
+    printf("Hola");
     do {
-        opc=opcAtr();
+        opc = opcBlq();
 
         switch(opc)
         {
@@ -865,10 +910,35 @@ void menuBloques(FILE *f, Entidad entAct, long direntAct)
         }
     }while(opc != 5);
 }
-
-void insertaBloque(FILE *f)
+/*
+void* capturaBloque()
 {
 
+}
+
+void insertaBloque(FILE *f, Entidad entAct, long direntAct, void* b, long dir)
+{
+    long cab = entAct.data;
+    void* bActual;
+
+    if(cab == -1)
+    {
+        entAct.data = dir;
+        reescribeEntidad(f,entAct,direntAct);
+    }
+    else
+    {
+        bActual = leeBloque(f, cab);
+
+        if(comparaBloques(f, bActual,b) > 0)
+        {
+            *((long*)(b+0)) = cab;
+            reescribeBloque(f, entAct, b, dir);
+            entAct.data = dir;
+            reescribeEntidad(f,entAct,direntAct);
+            free(bActual);
+        }
+    }
 }
 
 long eliminaBloque(FILE *f)
@@ -919,5 +989,15 @@ long buscaBloque(FILE *f, Entidad entAct, void* b)
         free(data);
     }
     return -1;
+}
+
+void modificaBloque(FILE *f, Entidad entAct)
+{
+
+}
+
+void reescribeBloque(FILE *f, Entidad entAct, void* b, long dir)
+{
+
 }
 */
