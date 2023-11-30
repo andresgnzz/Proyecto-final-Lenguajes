@@ -843,7 +843,6 @@ bool existeISKP(FILE *f, Entidad entAct)
     while (cab != -1)
     {
         atr = leeAtributo(f, cab);
-        printf("%s\n", atr.nombre);
 
         if(atr.iskp == 'S')
             cont++;
@@ -926,7 +925,6 @@ int opcBlq()
 void menuBloques(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, long tamBloque)
 {
     int opc;
-    printf("Hola");
     do {
         opc = opcBlq();
 
