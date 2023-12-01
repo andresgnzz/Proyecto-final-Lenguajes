@@ -885,7 +885,12 @@ long cargaAtributos(FILE *f, Entidad entAct, Atributo *arrAtr)
         cab = atr.sig;
         tamBloque += atr.tam;
     }
-    return tamBloque + 4;
+
+    for (int i = 0; i < cont; ++i) {
+        printf("\n%c", arrAtr[i].iskp);
+    }
+
+    return tamBloque + sizeof(long);
 }
 
 int comparaBloques(Atributo *arrAtr, void* b1, void* b2)
