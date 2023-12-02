@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 typedef char cadena[30];
 
@@ -28,6 +29,7 @@ void abrirDiccionario(FILE *f);
 void cerrarDiccionario(FILE *f);
 
 //Entidades
+
 void menuEntidades(FILE *f);
 void altaEntidad(FILE *f);
 Entidad capturaEntidad();
@@ -46,14 +48,13 @@ void rescribeCabEntidades(FILE *f,long dir);
 void pideNomEnt(cadena nombEnt);
 
 //Atributos
-//Todas las funciones necesitan como parametro la entidad activa (entAct) y la direccion de la entidad activa (direntAct)
 
 void menuAtributos(FILE *f, Entidad entAct, long direntAct);
 int opcAtr();
 long seleccionaTabla(FILE *f, Entidad *entAct, long *direntAct);
 void altaAtributo(FILE *f, Entidad *entAct, long direntAct);
 Atributo capturaAtributo();
-long buscaAtributo(FILE *f, cadena atrNom, Entidad entAct, long direntAct);
+long buscaAtributo(FILE *f, cadena atrNom, Entidad entAct);
 long escribeAtributo(FILE *f, Atributo atr);
 void insertaAtributo(FILE *f, Atributo atr, long dir, Entidad *entAct, long direntAct);
 Atributo leeAtributo(FILE *f, long dir);
@@ -63,6 +64,23 @@ long eliminaAtributo(FILE *f, cadena atrNom, Entidad *entAct, long direntAct);
 void modificaAtributo(FILE *f, Entidad *entAct, long direntAct);
 void consultaAtributo(FILE *f, Entidad entAct);
 void pideNombAtr(cadena nombAtr);
+
+//Bloques
+
+int opcBlq();
+void menuBloques(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque);
+bool existeISKP(FILE *f, Entidad entAct);
+long cargaAtributos(FILE *f, Entidad entAct, Atributo *arrAtr, int *nAtr);
+double comparaBloques(Atributo *arrAtr, void* b1, void* b2);
+void* capturaBloque();
+void insertaBloque(FILE *f, Entidad entAct, long direntAct, void* b, long dir);
+long eliminaBloque(FILE *f);
+void* leeBloque(FILE *f, long dir);
+long escribeBloque(FILE *f, void* b);
+long buscaBloque(FILE *f, Entidad entAct, void* b);
+void modificaBloque(FILE *f, Entidad entAct);
+void reescribeBloque(FILE *f, Entidad entAct, void* b, long dir);
+long existeBloqueDif(FILE *f, Entidad entAct, void* b, void* bNuevo);
 
 
 
@@ -165,9 +183,11 @@ void cerrarDiccionario(FILE *f)
 
 void menuEntidades(FILE *f)
 {
-    int opc;
+    int opc, nAtr;
     Entidad entAct;
     long direntAct;
+    Atributo arrAtr[50];
+    long tamBloque;
 
     do {
         printf("\n-------- MENU ENTIDADES --------\n");
@@ -202,6 +222,14 @@ void menuEntidades(FILE *f)
                 printf("\nApuntador atr: %ld", entAct.atr);
                 printf("\nDireccion entAct: %ld", direntAct);
                 menuAtributos(f, entAct, direntAct);
+            case 6:
+                seleccionaTabla(f, &entAct, &direntAct);
+                if(existeISKP(f, entAct) == true)
+                {
+                    tamBloque = cargaAtributos(f, entAct, arrAtr, &nAtr);
+                    menuBloques(f, entAct, direntAct, arrAtr, nAtr, tamBloque);
+                }
+                break;
             case 7:
                 menuPrincipal(f);
             default:
@@ -445,6 +473,9 @@ void pideNomEnt(cadena nombEnt)
     printf("\n");
 }
 
+
+
+
 //Funciones de Atributos
 
 void menuAtributos(FILE *f, Entidad entAct, long direntAct)
@@ -470,6 +501,7 @@ void menuAtributos(FILE *f, Entidad entAct, long direntAct)
                 break;
             case 5:
                 printf("\nRegresando a menu de entidades...\n ");
+                menuEntidades(f);
                 break;
             default:
                 printf("Ingresa una opcion del 1 al 5 ");
@@ -557,7 +589,7 @@ Atributo capturaAtributo()
     return nuevoAtributo;
 }
 
-long buscaAtributo(FILE *f, cadena atrNom, Entidad entAct, long direntAct)
+long buscaAtributo(FILE *f, cadena atrNom, Entidad entAct)
 {
     long cab;
     Atributo atr;
@@ -611,7 +643,7 @@ void altaAtributo(FILE *f, Entidad *entAct, long direntAct)
     nuevoAtr = capturaAtributo();
     printf("\nCaptura lista\n");
 
-    if(buscaAtributo(f, nuevoAtr.nombre, *entAct, direntAct) == -1)
+    if(buscaAtributo(f, nuevoAtr.nombre, *entAct) == -1)
     {
         printf("\nTermine de Buscar\n");
         dirNuevo = escribeAtributo(f, nuevoAtr);
@@ -681,7 +713,7 @@ void bajaAtributo(FILE *f, Entidad *entAct, long direntAct)
     printf("Nombre del Atributo a eliminar:");
     scanf("%s", nomAtr);
 
-    if(buscaAtributo(f, nomAtr, *entAct, direntAct) != -1)
+    if(buscaAtributo(f, nomAtr, *entAct) != -1)
     {
         eliminaAtributo(f, nomAtr, entAct, direntAct);
         printf("Se elimino correctamente el atributo.\n");
@@ -699,22 +731,22 @@ long eliminaAtributo(FILE *f, cadena atrNom, Entidad *entAct, long direntAct)
     cab = entAct->atr;
     atr = leeAtributo(f, cab);
 
-    if(strcmp(atr.nombre, atrNom) == 0)
+    if(strcmpi(atr.nombre, atrNom) == 0)
     {
         entAct->atr = atr.sig;
         reescribeEntidad(f, *entAct, direntAct);
     }
     else
     {
-        while(cab != -1 && strcmp(atr.nombre, atrNom) < 0) {
+        while(cab != -1 && strcmpi(atr.nombre, atrNom) < 0)
+        {
             cabAnt = cab;
             atrAnt = atr;
             cab = atr.sig;
 
             if (cab != -1)
-                atr = leeAtributo(f, direntAct);
+                atr = leeAtributo(f, cab);
         }
-
         atrAnt.sig = atr.sig;
         reescribeAtributo(f, atrAnt, cabAnt);
     }
@@ -729,13 +761,13 @@ void modificaAtributo(FILE *f, Entidad *entAct, long direntAct)
 
     pideNombAtr(nombAtr);
 
-    if(buscaAtributo(f, nombAtr, *entAct, direntAct) != -1)
+    if(buscaAtributo(f, nombAtr, *entAct) != -1)
     {
         nuevoAtr = capturaAtributo();
 
-        if(buscaAtributo(f, nuevoAtr.nombre, *entAct, direntAct) == -1)
+        if(buscaAtributo(f, nuevoAtr.nombre, *entAct) == -1)
         {
-            dirAtr = eliminaAtributo(f, nuevoAtr.nombre, entAct, direntAct);
+            dirAtr = eliminaAtributo(f, nombAtr, entAct, direntAct);
             reescribeAtributo(f, nuevoAtr, dirAtr);
             insertaAtributo(f, nuevoAtr, dirAtr, entAct, direntAct);
         }
@@ -754,7 +786,7 @@ void consultaAtributo(FILE *f, Entidad entAct)
     printf("--------------------------------------------------- ATRIBUTOS ---------------------------------------------------\n");
     printf("Entidad activa: %s\n\n", entAct.nombre);
 
-    printf("NOMBRE\t\t TIPO\t\t TAMANIO\t CLAVE PRIMARIA\t\t SIGUIENTE\t DESCRIPCION\n");
+    printf("NOMBRE\t\t TIPO\t TAMANIO\t CLAVE PRIMARIA\t SIGUIENTE\t DESCRIPCION\n");
 
     while (cab != -1)
     {
@@ -767,16 +799,16 @@ void consultaAtributo(FILE *f, Entidad entAct)
                 printf("Cadena\t\t");
                 break;
             case 2:
-                printf("Entero\t\t\t");
+                printf("Entero\t\t");
                 break;
             case 3:
-                printf("Float\t\t\t");
+                printf("Float\t\t");
                 break;
             case 4:
-                printf("Double\t\t\t");
+                printf("Double\t\t");
                 break;
             case 5:
-                printf("Long\t\t\t");
+                printf("Long\t\t");
                 break;
         }
 
@@ -796,3 +828,180 @@ void pideNombAtr(cadena nombAtr)
     scanf("%s", nombAtr);
     printf("\n");
 }
+
+
+
+
+//Funciones de Bloques
+
+bool existeISKP(FILE *f, Entidad entAct)
+{
+    int cont = 0;
+    long cab = entAct.atr;
+    Atributo atr;
+
+    while (cab != -1)
+    {
+        atr = leeAtributo(f, cab);
+
+        if(atr.iskp == 'S')
+            cont++;
+
+        cab = atr.sig;
+    }
+
+    if(cont == 1)
+        return true;
+    else if(cont > 1)
+        printf("\nError. Existe mas de una clave\n");
+    else
+        printf("\nError. No existe clave.\n");
+
+    return false;
+}
+
+long cargaAtributos(FILE *f, Entidad entAct, Atributo *arrAtr, int *nAtr)
+{
+    long tamBloque = sizeof(long);
+    long cab = entAct.atr;
+    int cont = 1;
+    Atributo atr;
+
+    while(cab != -1)
+    {
+        atr = leeAtributo(f, cab);
+
+        if(atr.iskp == 'S')
+        {
+            arrAtr[0] = atr;
+            cont--;
+        }
+
+        if(atr.iskp == 'N')
+            arrAtr[cont] = atr;
+
+        cont++;
+
+        cab = atr.sig;
+        tamBloque += atr.tam;
+    }
+
+    *nAtr = cont;
+    return tamBloque;
+}
+
+double comparaBloques(Atributo *arrAtr, void* b1, void* b2)
+{
+    switch (arrAtr[0].tipo)
+    {
+        case 1:
+            return strcmpi((char *)(b1 + sizeof(long)), (char *)(b2 + sizeof(long)));
+        case 2:
+            return *((int *)(b1 + sizeof(long))) - *((int *)(b2 + sizeof(long)));
+        case 3:
+            return *((float *)(b1 + sizeof(long))) - *((float *)(b2 + sizeof(long)));
+        case 4:
+            return *((double *)(b1 + sizeof(long))) - *((double *)(b2 + sizeof(long)));
+        case 5:
+            return *((long *)(b1 + sizeof(long))) - *((long *)(b2 + sizeof(long)));
+    }
+}
+
+int opcBlq()
+{
+    int opc;
+
+    printf("\n-------- MENU DATOS --------\n");
+    printf("1. Nuevo Registro\n");
+    printf("2. Consultar Registro\n");
+    printf("3. Eliminar Registro\n");
+    printf("4. Modificar Registro\n");
+    printf("5. Menu Anterior\n");
+    printf("----------------------------------\n");
+
+    scanf("%d", &opc);
+
+    return opc;
+}
+
+void menuBloques(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque)
+{
+    int opc;
+    do {
+        opc = opcBlq();
+
+        switch(opc)
+        {
+            case 1:
+                //insertaBloque
+                break;
+            case 2:
+                //consultaBloque
+                break;
+            case 3:
+                //eliminaBloque
+                break;
+            case 4:
+                //modificaBloque
+                break;
+            case 5:
+                printf("\nRegresando a menu de entidades...\n ");
+                menuEntidades(f);
+                break;
+            default:
+                printf("Ingresa una opcion del 1 al 5 ");
+        }
+    }while(opc != 5);
+}
+/*
+
+void insertaBloque(FILE *f, Entidad entAct, long direntAct, void* b, long dir)
+{
+
+}
+
+void* leeBloque(FILE *f, long dir)
+{
+    long tamBloque;
+    void* b = malloc(tamBloque);
+
+    fseek(f, dir, SEEK_SET);
+    fread(b, tamBloque, 1, f);
+
+    return b;
+}
+
+long escribeBloque(FILE *f, void* b)
+{
+    long pos, tamBloque;
+
+    fseek(f, 0, SEEK_END);
+    pos = ftell(f);
+    fwrite(b, tamBloque, 1, f);
+
+    return pos;
+}
+
+long buscaBloque(FILE *f, Entidad entAct, void* b)
+{
+    void* data;
+    long cab;
+
+    cab = entAct.data;
+
+    while (cab != -1)
+    {
+        data = leeBloque(f, cab);
+
+        if(comparaBloques(f, data, b) == 0)
+        {
+            free(data);
+            return cab;
+        }
+
+        cab = *((long *) data);
+        free(data);
+    }
+    return -1;
+}
+*/
