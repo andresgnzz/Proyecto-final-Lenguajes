@@ -68,10 +68,10 @@ void pideNombAtr(cadena nombAtr);
 //Bloques
 
 int opcBlq();
-void menuBloques(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, long tamBloque);
+void menuBloques(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque);
 bool existeISKP(FILE *f, Entidad entAct);
-long cargaAtributos(FILE *f, Entidad entAct, Atributo *arrAtr);
-int comparaBloques(Atributo *arrAtr, void* b1, void* b2);
+long cargaAtributos(FILE *f, Entidad entAct, Atributo *arrAtr, int *nAtr);
+double comparaBloques(Atributo *arrAtr, void* b1, void* b2);
 void* capturaBloque();
 void insertaBloque(FILE *f, Entidad entAct, long direntAct, void* b, long dir);
 long eliminaBloque(FILE *f);
@@ -183,7 +183,7 @@ void cerrarDiccionario(FILE *f)
 
 void menuEntidades(FILE *f)
 {
-    int opc;
+    int opc, nAtr;
     Entidad entAct;
     long direntAct;
     Atributo arrAtr[50];
@@ -226,8 +226,8 @@ void menuEntidades(FILE *f)
                 seleccionaTabla(f, &entAct, &direntAct);
                 if(existeISKP(f, entAct) == true)
                 {
-                    tamBloque = cargaAtributos(f, entAct, arrAtr);
-                    menuBloques(f, entAct, direntAct, arrAtr, tamBloque);
+                    tamBloque = cargaAtributos(f, entAct, arrAtr, &nAtr);
+                    menuBloques(f, entAct, direntAct, arrAtr, nAtr, tamBloque);
                 }
                 break;
             case 7:
@@ -860,9 +860,9 @@ bool existeISKP(FILE *f, Entidad entAct)
     return false;
 }
 
-long cargaAtributos(FILE *f, Entidad entAct, Atributo *arrAtr)
+long cargaAtributos(FILE *f, Entidad entAct, Atributo *arrAtr, int *nAtr)
 {
-    long tamBloque = 0;
+    long tamBloque = sizeof(long);
     long cab = entAct.atr;
     int cont = 1;
     Atributo atr;
@@ -886,14 +886,11 @@ long cargaAtributos(FILE *f, Entidad entAct, Atributo *arrAtr)
         tamBloque += atr.tam;
     }
 
-    for (int i = 0; i < cont; ++i) {
-        printf("\n%c", arrAtr[i].iskp);
-    }
-
-    return tamBloque + sizeof(long);
+    *nAtr = cont;
+    return tamBloque;
 }
 
-int comparaBloques(Atributo *arrAtr, void* b1, void* b2)
+double comparaBloques(Atributo *arrAtr, void* b1, void* b2)
 {
     switch (arrAtr[0].tipo)
     {
@@ -927,7 +924,7 @@ int opcBlq()
     return opc;
 }
 
-void menuBloques(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, long tamBloque)
+void menuBloques(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque)
 {
     int opc;
     do {
