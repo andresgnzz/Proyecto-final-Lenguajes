@@ -69,7 +69,7 @@ void pideNombAtr(cadena nombAtr);
 
 int opcBlq();
 void menuBloques(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int nAtr, void* b, long tamBloque);
-void consultaBloque(Entidad entAct, Atributo *arrAtr, int nAtr, long tamBloque);
+void consultaBloque(Entidad entAct, Atributo *arrAtr, int nAtr, void* b, long tamBloque);
 bool existeISKP(FILE *f, Entidad entAct);
 long cargaAtributos(FILE *f, Entidad entAct, Atributo *arrAtr, int *nAtr);
 double comparaBloques(Atributo *arrAtr, void* b1, void* b2);
@@ -939,7 +939,7 @@ void menuBloques(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int 
                 altaSecuencial(f, &entAct, direntAct, arrAtr, nAtr, b, tamBloque);
                 break;
             case 2:
-                consultaBloque(entAct, arrAtr, nAtr, tamBloque);
+                consultaBloque(entAct, arrAtr, nAtr, b, tamBloque);
                 break;
             case 3:
                 //eliminaBloque
@@ -1227,38 +1227,48 @@ long eliminaBloque(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, vo
     return -1;
 }
 
-void consultaBloque(Entidad entAct, Atributo *arrAtr, int nAtr, long tamBloque)
+void consultaBloque(Entidad entAct, Atributo *arrAtr, int nAtr, void* b, long tamBloque)
 {
-    void* p = malloc(tamBloque);
-    *((long*)p+0) = (long *) - 1;
-
     long des = sizeof(long);
-    int i = 0;
-
     long cab = entAct.data;
 
-    while(i < nAtr)
-    {
-        printf("\n");
-        switch (arrAtr[i].tipo)
+        for (int i = 0; i < nAtr; ++i)
         {
-            case 1:
-                printf("%s\t", (char *)(p+des));
-                break;
-            case 2:
-                printf("%d\t", (int*)(p+des));
-                break;
-            case 3:
-                printf("%f\t", (float*)(p+des));
-                break;
-            case 4:
-                printf("%lf\t", (double*)(p+des));
-                break;
-            case 5:
-                printf("%ld", (long*)(p+des));
-                break;
+            switch (arrAtr[i].tipo)
+            {
+                case 1:
+                    printf("%s\t", (char *)(b+des));
+                    break;
+                case 2:
+                {
+                    int ent;
+                    ent = *((int*)(b+des));
+                    printf("%d\t", ent);
+                    break;
+                }
+                case 3:
+                {
+                    float f;
+                    f = *((float*)(b+des));
+                    printf("%0.2f\t", f);
+                    break;
+                }
+                case 4:
+                {
+                    double d;
+                    d = *((double*)(b+des));
+                    printf("%lf\t", d);
+                    break;
+                }
+                case 5:
+                {
+                    long l;
+                    l = *((long*)(b+des));
+                    printf("%ld", l);
+                    break;
+                }
+            }
+            des += arrAtr[i].tam;
+            cab = *((long*)(b+0));
         }
-        des += arrAtr[i].tam;
-        i++;
-    }
 }
