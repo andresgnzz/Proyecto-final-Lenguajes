@@ -76,9 +76,9 @@ double comparaBloques(Atributo *arrAtr, void* b1, void* b2);
 void* capturaBloque(Atributo *arrAtr, long tamBloque, int nAtr);
 void* capturaBloqueClave(Atributo *arrAtr, long tamBloque, int nAtr);
 void insertaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, void* b, long tamBloque, long dir);
-void altaSecuencial(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque);
+void altaSecuencial(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque);
 long eliminaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, void* b, long tamBloque);
-void bajaSecuencial(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque);
+void bajaSecuencial(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque);
 void* leeBloque(FILE *f, long dir, long tamBloque);
 long escribeBloque(FILE *f, void* b, long tamBloque);
 long buscaBloque(FILE *f, Entidad entAct, Atributo *arrAtr, void* b, long tamBloque);
@@ -931,13 +931,13 @@ void menuBloques(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int 
         switch(opc)
         {
             case 1:
-                altaSecuencial(f, entAct, direntAct, arrAtr, nAtr, tamBloque);
+                altaSecuencial(f, &entAct, direntAct, arrAtr, nAtr, tamBloque);
                 break;
             case 2:
                 consultaBloque(f, entAct, arrAtr, nAtr, b, tamBloque);
                 break;
             case 3:
-                bajaSecuencial(f, entAct, direntAct, arrAtr, nAtr, tamBloque);
+                bajaSecuencial(f, &entAct, direntAct, arrAtr, nAtr, tamBloque);
                 break;
             case 4:
                 //PENDIENTE
@@ -1010,17 +1010,17 @@ void* capturaBloque(Atributo *arrAtr, long tamBloque, int nAtr)
     return p;
 }
 
-void altaSecuencial(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque)
+void altaSecuencial(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque)
 {
     void *nuevo;
     long dirnuevo;
 
     nuevo = capturaBloque(arrAtr, tamBloque, nAtr);
 
-    if(buscaBloque(f, entAct, arrAtr, nuevo, tamBloque) == -1)
+    if(buscaBloque(f, *entAct, arrAtr, nuevo, tamBloque) == -1)
     {
         dirnuevo = escribeBloque(f, nuevo, tamBloque);
-        insertaBloque(f, &entAct, direntAct, arrAtr, nuevo, tamBloque, dirnuevo);
+        insertaBloque(f, entAct, direntAct, arrAtr, nuevo, tamBloque, dirnuevo);
     }
     else
         printf("\nError. El bloque YA existe.\n");
@@ -1181,16 +1181,16 @@ void modificaBloque(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, i
         printf("\nError. El bloque NO existe.\n");
 }
 
-void bajaSecuencial(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque)
+void bajaSecuencial(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque)
 {
     void *b;
     long dir;
 
     b = capturaBloqueClave(arrAtr, tamBloque, nAtr);
 
-    if(buscaBloque(f, entAct, arrAtr, b, tamBloque) != -1)
+    if(buscaBloque(f, *entAct, arrAtr, b, tamBloque) != -1)
     {
-        eliminaBloque(f, &entAct, direntAct, arrAtr, b, tamBloque);
+        eliminaBloque(f, entAct, direntAct, arrAtr, b, tamBloque);
         printf("\nSe elimino correctamente.\n");
     }
     else
