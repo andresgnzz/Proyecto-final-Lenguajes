@@ -69,18 +69,20 @@ void pideNombAtr(cadena nombAtr);
 
 int opcBlq();
 void menuBloques(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int nAtr, void* b, long tamBloque);
-void consultaBloque(Entidad entAct, Atributo *arrAtr, int nAtr, void* b, long tamBloque);
+void consultaBloque(FILE *f, Entidad entAct, Atributo *arrAtr, int nAtr, void* b, long tamBloque);
 bool existeISKP(FILE *f, Entidad entAct);
 long cargaAtributos(FILE *f, Entidad entAct, Atributo *arrAtr, int *nAtr);
 double comparaBloques(Atributo *arrAtr, void* b1, void* b2);
 void* capturaBloque(Atributo *arrAtr, long tamBloque, int nAtr);
+void* capturaBloqueClave(Atributo *arrAtr, long tamBloque, int nAtr);
 void insertaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, void* b, long tamBloque, long dir);
-void altaSecuencial(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, int nAtr, void* b, long tamBloque);
-long eliminaBloque(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, void* b, long tamBloque);
+void altaSecuencial(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque);
+long eliminaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, void* b, long tamBloque);
+void bajaSecuencial(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque);
 void* leeBloque(FILE *f, long dir, long tamBloque);
 long escribeBloque(FILE *f, void* b, long tamBloque);
 long buscaBloque(FILE *f, Entidad entAct, Atributo *arrAtr, void* b, long tamBloque);
-void modificaBloque(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque, long dir);
+void modificaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque);
 void reescribeBloque(FILE *f, void* b, long dir, long tamBloque);
 long existeBloqueDif(FILE *f, Entidad entAct, Atributo *arrAtr, void* b, void* bNuevo, long tamBloque);
 
@@ -230,6 +232,7 @@ void menuEntidades(FILE *f)
                 if(existeISKP(f, entAct) == true)
                 {
                     tamBloque = cargaAtributos(f, entAct, arrAtr, &nAtr);
+                    printf("\n%ld\n", tamBloque);
                     menuBloques(f, entAct, direntAct, arrAtr, nAtr, b, tamBloque);
                 }
                 break;
@@ -449,11 +452,14 @@ void modificaEntidad(FILE *f)
     Entidad nuevaEnt;
     long dir;
 
+    printf("\nEntidad que desea modificar\n");
     pideNomEnt(nombEnt);
 
     if(buscaEntidad(f, nombEnt) != -1)
     {
+        printf("\nNueva Entidad\n");
         pideNomEnt(nombEntNueva);
+
         if(buscaEntidad(f, nombEntNueva) == -1)
         {
             nuevaEnt = capturaEntidad();
@@ -597,12 +603,10 @@ long buscaAtributo(FILE *f, cadena atrNom, Entidad entAct)
     long cab;
     Atributo atr;
 
-    printf("\nCabecera: %ld\n", entAct.atr);
     cab = entAct.atr;
 
     while(cab != -1)
     {
-        printf("\nCabecera: %ld\n", entAct.atr);
         atr = leeAtributo(f, cab);
 
         if(strcmp(atr.nombre, atrNom) == 0)
@@ -644,13 +648,10 @@ void altaAtributo(FILE *f, Entidad *entAct, long direntAct)
     long dirNuevo;
 
     nuevoAtr = capturaAtributo();
-    printf("\nCaptura lista\n");
 
     if(buscaAtributo(f, nuevoAtr.nombre, *entAct) == -1)
     {
-        printf("\nTermine de Buscar\n");
         dirNuevo = escribeAtributo(f, nuevoAtr);
-        printf("Escribi en %ld", dirNuevo);
         insertaAtributo(f, nuevoAtr, dirNuevo, entAct, direntAct);
     }
     else
@@ -664,11 +665,8 @@ void insertaAtributo(FILE *f, Atributo atr, long dir, Entidad *entAct, long dire
 
     cab = entAct->atr;
 
-    printf("\nCabecera en inserta: %ld\n", cab);
-
     if(cab == -1)
     {
-        printf("\nCaso 1\n");
         entAct->atr = dir;
         reescribeEntidad(f, *entAct, direntAct);
     }
@@ -936,16 +934,17 @@ void menuBloques(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int 
         switch(opc)
         {
             case 1:
-                altaSecuencial(f, &entAct, direntAct, arrAtr, nAtr, b, tamBloque);
+                altaSecuencial(f, &entAct, direntAct, arrAtr, nAtr, tamBloque);
                 break;
             case 2:
-                consultaBloque(entAct, arrAtr, nAtr, b, tamBloque);
+                consultaBloque(f, entAct, arrAtr, nAtr, b, tamBloque);
                 break;
             case 3:
-                //eliminaBloque
+                bajaSecuencial(f, &entAct, direntAct, arrAtr, nAtr, tamBloque);
                 break;
             case 4:
-                //modificaBloque
+                //PENDIENTE
+                modificaBloque(f,&entAct, direntAct, arrAtr, nAtr, tamBloque);
                 break;
             case 5:
                 printf("\nRegresando a menu de entidades...\n ");
@@ -960,7 +959,7 @@ void menuBloques(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int 
 void* capturaBloque(Atributo *arrAtr, long tamBloque, int nAtr)
 {
     void* p = malloc(tamBloque);
-    *((long*)p+0) = (long *) - 1;
+    *((long*)p+0) = (long) - 1;
     long des = sizeof(long);
     int i = 0;
 
@@ -973,6 +972,7 @@ void* capturaBloque(Atributo *arrAtr, long tamBloque, int nAtr)
             case 1:
             {
                 char cad[500];
+                fflush(stdin);
                 scanf("%s", cad);
                 cad[arrAtr[i].tam - 1] = '\0';
                 strcpy((char *)(p+des),cad);
@@ -1007,12 +1007,13 @@ void* capturaBloque(Atributo *arrAtr, long tamBloque, int nAtr)
                 break;
             }
         }
+        des += arrAtr[i].tam;
         i++;
     }
     return p;
 }
 
-void altaSecuencial(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, int nAtr, void* b, long tamBloque)
+void altaSecuencial(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque)
 {
     void *nuevo;
     long dirnuevo;
@@ -1140,7 +1141,7 @@ long existeBloqueDif(FILE *f, Entidad entAct, Atributo *arrAtr, void* b, void* b
     void* data;
     cab = entAct.data;
 
-    while(cab!=-1)
+    while(cab != -1)
     {
         data = leeBloque(f, cab, tamBloque);
 
@@ -1154,24 +1155,27 @@ long existeBloqueDif(FILE *f, Entidad entAct, Atributo *arrAtr, void* b, void* b
             else
                 return cab;
         }
-        cab=*((long*)data);
+        cab = *((long*)data);
     }
 }
 
-void modificaBloque(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int nAtr,  long tamBloque, long dir)
+void modificaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, int nAtr,  long tamBloque)
 {
-
+    long dir;
     void *b, *nuevo;
-    b = capturaBloque(arrAtr, tamBloque, nAtr);
 
-    if(buscaBloque(f, entAct, arrAtr, b, tamBloque) != -1)
+    b = capturaBloqueClave(arrAtr, tamBloque, nAtr);
+
+    if(buscaBloque(f, *entAct, arrAtr, b, tamBloque) != -1)
     {
+        printf("\nBloque Nuevo:\n");
         nuevo = capturaBloque(arrAtr, tamBloque, nAtr);
-        if(existeBloqueDif(f, entAct, arrAtr, nuevo, b, tamBloque) != -1)
+
+        if(existeBloqueDif(f, *entAct, arrAtr, nuevo, b, tamBloque) != -1)
         {
             dir = eliminaBloque(f, entAct, direntAct, arrAtr, b, tamBloque);
             reescribeBloque(f, nuevo, dir, tamBloque);
-            insertaBloque(f, &entAct, direntAct, arrAtr, nuevo, tamBloque, dir);
+            insertaBloque(f, entAct, direntAct, arrAtr, nuevo, tamBloque, dir);
         }
         else
             printf("\nError. El bloque YA existe.\n");
@@ -1180,9 +1184,25 @@ void modificaBloque(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, i
         printf("\nError. El bloque NO existe.\n");
 }
 
-long eliminaBloque(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, void* b, long tamBloque)
+void bajaSecuencial(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque)
 {
-    long cab = entAct.data;
+    void *b;
+    long dir;
+
+    b = capturaBloqueClave(arrAtr, tamBloque, nAtr);
+
+    if(buscaBloque(f, *entAct, arrAtr, b, tamBloque) != -1)
+    {
+        eliminaBloque(f, entAct, direntAct, arrAtr, b, tamBloque);
+        printf("\nSe elimino correctamente.\n");
+    }
+    else
+        printf("\nError. El bloque NO existe.\n");
+}
+
+long eliminaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, void* b, long tamBloque)
+{
+    long cab = entAct->data;
     long dirAnt;
     void* bAnt = NULL;
     void* bAux;
@@ -1193,8 +1213,8 @@ long eliminaBloque(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, vo
 
         if (comparaBloques(arrAtr, b, bAux) == 0)
         {
-            entAct.data = *((long *) bAux);
-            reescribeEntidad(f, entAct, direntAct);
+            entAct->data = *((long *) bAux);
+            reescribeEntidad(f, *entAct, direntAct);
             free(bAux);
             free(b);
             return cab;
@@ -1227,48 +1247,116 @@ long eliminaBloque(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, vo
     return -1;
 }
 
-void consultaBloque(Entidad entAct, Atributo *arrAtr, int nAtr, void* b, long tamBloque)
+void consultaBloque(FILE *f, Entidad entAct, Atributo *arrAtr, int nAtr, void* b, long tamBloque)
 {
     long des = sizeof(long);
     long cab = entAct.data;
 
+    printf("\n--------------------------------------------------- BLOQUES ---------------------------------------------------\n");
+    printf("Entidad activa: %s\n\n", entAct.nombre);
+
     for (int i = 0; i < nAtr; ++i)
+        printf("%s\t\t", arrAtr[i].nombre);
+
+    printf("\n");
+
+    while (cab != -1)
     {
-        switch (arrAtr[i].tipo)
+        des = sizeof(long);
+        b = leeBloque(f, cab, tamBloque);
+
+        for (int i = 0; i < nAtr; ++i)
         {
-            case 1:
-                printf("%s\t", (char *)(b+des));
-                break;
-            case 2:
+            switch (arrAtr[i].tipo)
             {
-                int ent;
-                ent = *((int*)(b+des));
-                printf("%d\t", ent);
-                break;
+                case 1:
+                    printf("%s\t\t", (char *)(b+des));
+                    break;
+                case 2:
+                {
+                    int ent;
+                    ent = *((int*)(b+des));
+                    printf("%d\t\t", ent);
+                    break;
+                }
+                case 3:
+                {
+                    float flot;
+                    flot = *((float*)(b+des));
+                    printf("%0.2f\t\t", flot);
+                    break;
+                }
+                case 4:
+                {
+                    double db;
+                    db = *((double*)(b+des));
+                    printf("%lf\t\t", db);
+                    break;
+                }
+                case 5:
+                {
+                    long l;
+                    l = *((long*)(b+des));
+                    printf("%ld\t\t", l);
+                    break;
+                }
             }
-            case 3:
-            {
-                float f;
-                f = *((float*)(b+des));
-                printf("%0.2f\t", f);
-                break;
-            }
-            case 4:
-            {
-                double d;
-                d = *((double*)(b+des));
-                printf("%lf\t", d);
-                break;
-            }
-            case 5:
-            {
-                long l;
-                l = *((long*)(b+des));
-                printf("%ld", l);
-                break;
-            }
+            des += arrAtr[i].tam;
         }
-        des += arrAtr[i].tam;
+        printf("\n");
         cab = *((long*)(b+0));
     }
+
+    printf("\n-----------------------------------------------------------------------------------------------------------------\n");
+}
+
+void* capturaBloqueClave(Atributo *arrAtr, long tamBloque, int nAtr)
+{
+    void* p = malloc(tamBloque);
+    *((long*)p+0) = (long) - 1;
+    long des = sizeof(long);
+
+    printf("Ingrese el/la %s del bloque que deseas eliminar:", arrAtr[0].nombre);
+
+    switch (arrAtr[0].tipo)
+    {
+        case 1:
+        {
+            char cad[500];
+            fflush(stdin);
+            scanf("%s", cad);
+            cad[arrAtr[0].tam - 1] = '\0';
+            strcpy((char *)(p+des),cad);
+            break;
+        }
+        case 2:
+        {
+            int entero;
+            scanf("%d", &entero);
+            *((int*)(p+des)) = entero;
+            break;
+        }
+        case 3:
+        {
+            float flotante;
+            scanf("%f", &flotante);
+            *((float*)(p+des)) = flotante;
+            break;
+        }
+        case 4:
+        {
+            double doble;
+            scanf("%lf", &doble);
+            *(double*)(p+des) = doble;
+            break;
+        }
+        case 5:
+        {
+            long largo;
+            scanf("%ld", &largo);
+            *((long*)(p+des)) = largo;
+            break;
+        }
+    }
+    return p;
 }

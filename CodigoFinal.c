@@ -232,7 +232,6 @@ void menuEntidades(FILE *f)
                 if(existeISKP(f, entAct) == true)
                 {
                     tamBloque = cargaAtributos(f, entAct, arrAtr, &nAtr);
-                    printf("\n%ld\n", tamBloque);
                     menuBloques(f, entAct, direntAct, arrAtr, nAtr, b, tamBloque);
                 }
                 break;
@@ -452,14 +451,16 @@ void modificaEntidad(FILE *f)
     Entidad nuevaEnt;
     long dir;
 
+    printf("\nEntidad que desea modificar\n");
     pideNomEnt(nombEnt);
 
     if(buscaEntidad(f, nombEnt) != -1)
     {
-        pideNomEnt(nombEntNueva);
-        if(buscaEntidad(f, nombEntNueva) == -1)
+        printf("\nNueva Entidad\n");
+        nuevaEnt = capturaEntidad();
+
+        if(buscaEntidad(f, nuevaEnt.nombre) == -1)
         {
-            nuevaEnt = capturaEntidad();
             dir = eliminaEntidad(f, nombEnt);
             strcpy(nombEnt, nombEntNueva);
             reescribeEntidad(f, nuevaEnt, dir);
@@ -757,10 +758,12 @@ void modificaAtributo(FILE *f, Entidad *entAct, long direntAct)
     cadena nombAtr;
     long dirAtr;
 
+    printf("\nNombre del atributo que desea modificar\n");
     pideNombAtr(nombAtr);
 
     if(buscaAtributo(f, nombAtr, *entAct) != -1)
     {
+        printf("\nNuevo atributo\n");
         nuevoAtr = capturaAtributo();
 
         if(buscaAtributo(f, nuevoAtr.nombre, *entAct) == -1)
