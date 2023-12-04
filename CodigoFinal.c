@@ -82,7 +82,7 @@ void bajaSecuencial(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, 
 void* leeBloque(FILE *f, long dir, long tamBloque);
 long escribeBloque(FILE *f, void* b, long tamBloque);
 long buscaBloque(FILE *f, Entidad entAct, Atributo *arrAtr, void* b, long tamBloque);
-void modificaBloque(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque);
+void modificaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque);
 void reescribeBloque(FILE *f, void* b, long dir, long tamBloque);
 long existeBloqueDif(FILE *f, Entidad entAct, Atributo *arrAtr, void* b, void* bNuevo, long tamBloque);
 
@@ -941,7 +941,7 @@ void menuBloques(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int 
                 break;
             case 4:
                 //PENDIENTE
-                modificaBloque(f,entAct,direntAct,arrAtr,nAtr,tamBloque);
+                modificaBloque(f,&entAct, direntAct, arrAtr, nAtr, tamBloque);
                 break;
             case 5:
                 printf("\nRegresando a menu de entidades...\n ");
@@ -1152,27 +1152,27 @@ long existeBloqueDif(FILE *f, Entidad entAct, Atributo *arrAtr, void* b, void* b
             else
                 return cab;
         }
-        cab=*((long*)data);
+        cab = *((long*)data);
     }
 }
 
-void modificaBloque(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int nAtr,  long tamBloque)
+void modificaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, int nAtr,  long tamBloque)
 {
     long dir;
     void *b, *nuevo;
 
     b = capturaBloqueClave(arrAtr, tamBloque, nAtr);
 
-    if(buscaBloque(f, entAct, arrAtr, b, tamBloque) != -1)
+    if(buscaBloque(f, *entAct, arrAtr, b, tamBloque) != -1)
     {
         printf("\nBloque Nuevo:\n");
         nuevo = capturaBloque(arrAtr, tamBloque, nAtr);
 
-        if(existeBloqueDif(f, entAct, arrAtr, nuevo, b, tamBloque) != -1)
+        if(existeBloqueDif(f, *entAct, arrAtr, nuevo, b, tamBloque) != -1)
         {
-            dir = eliminaBloque(f, &entAct, direntAct, arrAtr, b, tamBloque);
+            dir = eliminaBloque(f, entAct, direntAct, arrAtr, b, tamBloque);
             reescribeBloque(f, nuevo, dir, tamBloque);
-            insertaBloque(f, &entAct, direntAct, arrAtr, nuevo, tamBloque, dir);
+            insertaBloque(f, entAct, direntAct, arrAtr, nuevo, tamBloque, dir);
         }
         else
             printf("\nError. El bloque YA existe.\n");
