@@ -97,6 +97,7 @@ int main()
 
 }
 
+//Menu Principal del diccionario de datos
 void menuPrincipal(FILE *f)
 {
     int opc = 0;
@@ -129,6 +130,7 @@ void menuPrincipal(FILE *f)
     } while (opc != 3);
 }
 
+//Funcion para crear un nuevo diccionario en forma wb+
 void nuevoDiccionario(FILE *f)
 {
     cadena nombArch;
@@ -153,6 +155,7 @@ void nuevoDiccionario(FILE *f)
     }
 }
 
+//Funcion para abrir un nuevo diccionario en forma rb+
 void abrirDiccionario(FILE *f)
 {
     cadena nombArch;
@@ -177,14 +180,19 @@ void abrirDiccionario(FILE *f)
     }
 }
 
+//Funcion para cerrar el archivo
 void cerrarDiccionario(FILE *f)
 {
     if(f != NULL)
         fclose(f);
 }
 
+
+
+
 //Funciones de Entidades
 
+//Menu principal de las entidades, se mandan llamar todas las funciones de entidades, menu de aributos y menu bloques.
 void menuEntidades(FILE *f)
 {
     int opc, nAtr;
@@ -244,6 +252,7 @@ void menuEntidades(FILE *f)
 
 }
 
+//Inserta una entidad y verifica en que caso se va a insertar, al inicio sin datos, al inicio con datos en medio o al final.
 void insertaEntidad(FILE *f, Entidad nueva, long dir)
 {
     Entidad aux, entAnt;
@@ -283,23 +292,25 @@ void insertaEntidad(FILE *f, Entidad nueva, long dir)
     }
 }
 
+//Verifica si la funcion que deseamos insertar existe o no. Si no existe la inserta.
 void altaEntidad(FILE *f)
 {
     Entidad ent;
     long pos;
 
-    ent = capturaEntidad();  //Se captura la entidad que se desea agregar al archivo
+    ent = capturaEntidad();
 
-    if(buscaEntidad(f, ent.nombre) == -1)  //Verifica si la entidad existe o no
+    if(buscaEntidad(f, ent.nombre) == -1)
     {
-        pos = escribeEntidad(f, ent); //Escribe la entidad en el archivo pero no es accesible
-        insertaEntidad(f, ent, pos);  //Crea los enlaces necesarios para acceder a la entidad
+        pos = escribeEntidad(f, ent);
+        insertaEntidad(f, ent, pos);
         fseek(f, 0, SEEK_END);
     }
     else
         printf("La Entidad ya existe.\n");
 }
 
+//Se encarga de capturar el nombre de la entidad e iniciar sus apuntadores en -1.
 Entidad capturaEntidad()
 {
     Entidad ent;
@@ -312,6 +323,7 @@ Entidad capturaEntidad()
     return ent;
 }
 
+//Busca la entidad en la lista por su nombre y regresa la direcciion en la que se encuentra.
 long buscaEntidad(FILE *f, cadena entNom)
 {
     Entidad ent;
@@ -331,6 +343,7 @@ long buscaEntidad(FILE *f, cadena entNom)
     return -1;
 }
 
+//Escribe la entidad dentro del archivo en la posicion que indique ftell.
 long escribeEntidad(FILE *f, Entidad ent)
 {
     long dir;
@@ -342,6 +355,7 @@ long escribeEntidad(FILE *f, Entidad ent)
     return dir;
 }
 
+//Cuando se crea el archivo nuevo, esta funcion escribe un -1 al inicio del archivo.
 void escribeCabEntidades(FILE *f)
 {
     long cab = -1;
@@ -350,29 +364,36 @@ void escribeCabEntidades(FILE *f)
     fwrite(&cab, sizeof (long), 1, f);
 }
 
+// Nos regresa en que posicion se encuentra la primera entidad del archivo.
 long getCabEntidades(FILE *f)
 {
     long cab;
+
     fseek(f,0,SEEK_SET);
     fread(&cab,sizeof (long),1,f);
 
     return cab;
 }
 
+//Lee la entidad del archivo dependiendo de la direccion que reciba.
 Entidad leeEntidad(FILE  *f,long dir)
 {
     Entidad ent;
+
     fseek(f,dir,SEEK_SET);
     fread(&ent,sizeof(Entidad),1,f);
+
     return ent;
 }
 
+//Sobreescribe una entidad en la smisma direccion con otra.
 void reescribeEntidad(FILE *f,Entidad ent, long dir)
 {
     fseek(f,dir,SEEK_SET);
     fwrite(&ent,sizeof(Entidad),1,f);
 }
 
+//Se encarga de imprimir todas las entiddes del archivo.
 void consultaEntidad(FILE *f)
 {
     Entidad  ent;
@@ -390,6 +411,7 @@ void consultaEntidad(FILE *f)
     printf("---------------------------------\n\n");
 }
 
+//Verifica si la entidad que queremos eliminar existe o no.
 void bajaEntidad(FILE *f)
 {
     long dir;
@@ -405,6 +427,7 @@ void bajaEntidad(FILE *f)
         printf("La entidad %s no existe.", nombEnt);
 }
 
+//Verifica donde esta la entidad que se quiere eliminar y se aplican cada caso correspondiente, al inicio, al medio o al final.
 long eliminaEntidad(FILE *f, cadena nomb)
 {
     long posEntAnt;
@@ -438,6 +461,7 @@ long eliminaEntidad(FILE *f, cadena nomb)
     return cab;
 }
 
+//Se encarga de modificar la cabecera de las entidades en el archivo.
 void rescribeCabEntidades(FILE *f,long dir)
 {
     long cab = dir;
@@ -445,6 +469,7 @@ void rescribeCabEntidades(FILE *f,long dir)
     fwrite(&cab,sizeof(long),1,f);
 }
 
+//Nos sirve para modificar una entidad con otra si es que la que queremos modificar existe y la nueva no existe.
 void modificaEntidad(FILE *f)
 {
     cadena nombEnt, nombEntNueva;
@@ -473,6 +498,7 @@ void modificaEntidad(FILE *f)
         printf("Error. La entidad que desea modificar no existe.\n");
 }
 
+//Unicamente regresa un nombre.
 void pideNomEnt(cadena nombEnt)
 {
     printf("Ingresa el nombre de la Entidad:");
@@ -485,6 +511,7 @@ void pideNomEnt(cadena nombEnt)
 
 //Funciones de Atributos
 
+//Menu principal de los atributos, nos da acceso a todas las funciones de estos.
 void menuAtributos(FILE *f, Entidad entAct, long direntAct)
 {
     int opc;
@@ -516,6 +543,7 @@ void menuAtributos(FILE *f, Entidad entAct, long direntAct)
     }while(opc != 5);
 }
 
+//Seleccion de opcion para el menu de atributos.
 int opcAtr()
 {
     int op;
@@ -533,6 +561,7 @@ int opcAtr()
     return op;
 }
 
+//Con esta funcion indicamos con que entidad queremos trabajar y si existe o no.
 long seleccionaTabla(FILE *f, Entidad *entAct, long *direntAct)
 {
     printf("Con que Entidad deseas trabajar:");
@@ -551,6 +580,7 @@ long seleccionaTabla(FILE *f, Entidad *entAct, long *direntAct)
     return -1;
 }
 
+//Funcion para capturar atributos.
 Atributo capturaAtributo()
 {
     Atributo nuevoAtributo;
@@ -597,6 +627,7 @@ Atributo capturaAtributo()
     return nuevoAtributo;
 }
 
+//Se encarga de buscar un atributo dentro del archivo y si este existe o no.
 long buscaAtributo(FILE *f, cadena atrNom, Entidad entAct)
 {
     long cab;
@@ -615,12 +646,15 @@ long buscaAtributo(FILE *f, cadena atrNom, Entidad entAct)
     }
     return -1;
 }
+
+//Sobreescribe un atributo en otro con la direccion dada.
 void reescribeAtributo(FILE *f, Atributo atr, long dir)
 {
     fseek(f,dir,SEEK_SET);
     fwrite(&atr,sizeof (atr),1,f);
 }
 
+//Lee un atributo en el archivo en una direccion dada.
 Atributo leeAtributo(FILE *f, long dir)
 {
     Atributo atr;
@@ -630,6 +664,8 @@ Atributo leeAtributo(FILE *f, long dir)
 
     return atr;
 }
+
+//Escribe el atributo dentro del archivo dependiendo de la posicion.
 long escribeAtributo(FILE *f, Atributo atr)
 {
     long pos;
@@ -641,6 +677,7 @@ long escribeAtributo(FILE *f, Atributo atr)
     return pos;
 }
 
+//Verifica si el atributo que queremos insertar existe o no.
 void altaAtributo(FILE *f, Entidad *entAct, long direntAct)
 {
     Atributo nuevoAtr;
@@ -657,6 +694,7 @@ void altaAtributo(FILE *f, Entidad *entAct, long direntAct)
         printf("Error. El Atributo que desea agregar ya existe.");
 }
 
+//Verifica en que caso se va a insertar el atributo, al inicio sin datos, al inicio con datos, al medio o al final.
 void insertaAtributo(FILE *f, Atributo atr, long dir, Entidad *entAct, long direntAct)
 {
     long cab, dirAnt;
@@ -703,6 +741,7 @@ void insertaAtributo(FILE *f, Atributo atr, long dir, Entidad *entAct, long dire
     }
 }
 
+//Verifica si el atributo que queremos eliminar existe o no.
 void bajaAtributo(FILE *f, Entidad *entAct, long direntAct)
 {
     //Localiza el atributo y si no existe marca un error
@@ -723,6 +762,7 @@ void bajaAtributo(FILE *f, Entidad *entAct, long direntAct)
 
 }
 
+//Verifica en que caso se va a eliminar el atributo.
 long eliminaAtributo(FILE *f, cadena atrNom, Entidad *entAct, long direntAct)
 {
     long cab, cabAnt;
@@ -753,6 +793,7 @@ long eliminaAtributo(FILE *f, cadena atrNom, Entidad *entAct, long direntAct)
     return cab;
 }
 
+//Nos permite modificar un atributo y verifica si el que queremos modifcar existe y que el que queremos insertar no exista.
 void modificaAtributo(FILE *f, Entidad *entAct, long direntAct)
 {
     Atributo nuevoAtr;
@@ -780,6 +821,7 @@ void modificaAtributo(FILE *f, Entidad *entAct, long direntAct)
         printf("Error. No se puede modificar el atributo porque NO existe.\n");
 }
 
+//Funcion que nos permite visualizar los atributos.
 void consultaAtributo(FILE *f, Entidad entAct)
 {
     Atributo atr;
@@ -824,6 +866,7 @@ void consultaAtributo(FILE *f, Entidad entAct)
     printf("-----------------------------------------------------------------------------------------------------------------\n");
 }
 
+//Nos pide un nombre de un atributo.
 void pideNombAtr(cadena nombAtr)
 {
     printf("Ingresa el nombre del atributo:");
@@ -836,6 +879,7 @@ void pideNombAtr(cadena nombAtr)
 
 //Funciones de Bloques
 
+//Verifica si en los atributos existe una clave primaria
 bool existeISKP(FILE *f, Entidad entAct)
 {
     int cont = 0;
@@ -862,6 +906,7 @@ bool existeISKP(FILE *f, Entidad entAct)
     return false;
 }
 
+//Crea un arreglo de atributos e inserta en la posicion [0] la clave primaria, regresa su tamaño y el numero de atributos.
 long cargaAtributos(FILE *f, Entidad entAct, Atributo *arrAtr, int *nAtr)
 {
     long tamBloque = sizeof(long);
@@ -892,6 +937,7 @@ long cargaAtributos(FILE *f, Entidad entAct, Atributo *arrAtr, int *nAtr)
     return tamBloque;
 }
 
+//Compara la clave primaria de dos bloque para verificar si son iguales o diferentes.
 double comparaBloques(Atributo *arrAtr, void* b1, void* b2)
 {
     switch (arrAtr[0].tipo)
@@ -909,6 +955,7 @@ double comparaBloques(Atributo *arrAtr, void* b1, void* b2)
     }
 }
 
+//Unicamente soolo regresa la opcion del menu de bloques.
 int opcBlq()
 {
     int opc;
@@ -926,6 +973,7 @@ int opcBlq()
     return opc;
 }
 
+//Menu de bloques se encarga de mandar llamar todas las funciones de bloques, es accesible unicamente si existe una unica clave primaria dentro de los atributos.
 void menuBloques(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int nAtr, void* b, long tamBloque)
 {
     int opc;
@@ -957,6 +1005,7 @@ void menuBloques(FILE *f, Entidad entAct, long direntAct, Atributo *arrAtr, int 
     }while(opc != 5);
 }
 
+//Captura los datos del bloque de datos los cuales corresponden a los atributos.
 void* capturaBloque(Atributo *arrAtr, long tamBloque, int nAtr)
 {
     void* p = malloc(tamBloque);
@@ -1014,6 +1063,7 @@ void* capturaBloque(Atributo *arrAtr, long tamBloque, int nAtr)
     return p;
 }
 
+//Verifica si el bloque que queremos insertar no existe.
 void altaSecuencial(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque)
 {
     void *nuevo;
@@ -1030,6 +1080,7 @@ void altaSecuencial(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, 
         printf("\nError. El bloque YA existe.\n");
 }
 
+//Verifica en donde va acomodado el dato dependiendo de su clave primaria.
 void insertaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, void* b, long tamBloque, long dir)
 {
     long cab = entAct->data;
@@ -1086,6 +1137,7 @@ void insertaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, v
     }
 }
 
+//Lee el bloque dentro del archivo en la direccion y el tamaño del bloque que le pasemos
 void* leeBloque(FILE *f, long dir, long tamBloque)
 {
     void* b = malloc(tamBloque);
@@ -1096,6 +1148,7 @@ void* leeBloque(FILE *f, long dir, long tamBloque)
     return b;
 }
 
+//Escribe el bloque en la posicion que regrese fell con el tamaño del bloque.
 long escribeBloque(FILE *f, void* b, long tamBloque)
 {
     long pos;
@@ -1107,6 +1160,7 @@ long escribeBloque(FILE *f, void* b, long tamBloque)
     return pos;
 }
 
+//Verifica si un bloque existe y regresa su direccion.
 long buscaBloque(FILE *f, Entidad entAct, Atributo *arrAtr, void* b, long tamBloque)
 {
     void* data;
@@ -1130,12 +1184,14 @@ long buscaBloque(FILE *f, Entidad entAct, Atributo *arrAtr, void* b, long tamBlo
     return -1;
 }
 
+//Sobreescribe un bloque dentro de un archivo con otro.
 void reescribeBloque(FILE *f, void* b, long dir, long tamBloque)
 {
     fseek(f,dir,SEEK_SET);
     fwrite(b,tamBloque,1,f);
 }
 
+//Verifica si los dos bloques que recibe son validos o no.
 long existeBloqueDif(FILE *f, Entidad entAct, Atributo *arrAtr, void* b, void* bMod, long tamBloque)
 {
     long cab;
@@ -1166,6 +1222,7 @@ long existeBloqueDif(FILE *f, Entidad entAct, Atributo *arrAtr, void* b, void* b
     return -1;
 }
 
+//Se encarga de modificar los bloques, y verifica si existe o no cada bloque.
 void modificaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, int nAtr,  long tamBloque)
 {
     long dir;
@@ -1194,6 +1251,7 @@ void modificaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, 
         printf("\nError. El bloque NO existe.\n");
 }
 
+//verifica si el bloque que queremos eliminar existe o no.
 void bajaSecuencial(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, int nAtr, long tamBloque)
 {
     void *b;
@@ -1210,6 +1268,7 @@ void bajaSecuencial(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, 
         printf("\nError. El bloque NO existe.\n");
 }
 
+//Se encarga de eliminar los bloques y en que caso se elimina.
 long eliminaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, void* b, long tamBloque)
 {
     long cab = entAct->data;
@@ -1257,6 +1316,7 @@ long eliminaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, v
     return -1;
 }
 
+//Se encarga de imprimir y mostrar los bloques de datos dentro de la entidad.
 void consultaBloque(FILE *f, Entidad entAct, Atributo *arrAtr, int nAtr, void* b, long tamBloque)
 {
     long des = sizeof(long);
@@ -1320,6 +1380,7 @@ void consultaBloque(FILE *f, Entidad entAct, Atributo *arrAtr, int nAtr, void* b
     printf("\n-----------------------------------------------------------------------------------------------------------------\n");
 }
 
+//Captura unicamete la clav eprimaria de un bloque.
 void* capturaBloqueClave(Atributo *arrAtr, long tamBloque, int nAtr)
 {
     void* p = malloc(tamBloque);
