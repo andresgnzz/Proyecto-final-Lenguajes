@@ -1043,7 +1043,7 @@ void insertaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, v
         reescribeEntidad(f,*entAct,direntAct);
     }
     else
-     {
+    {
         bAct = leeBloque(f, cab, tamBloque);
 
         if(comparaBloques(arrAtr, bAct,b) > 0)
@@ -1178,7 +1178,7 @@ void modificaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, 
     {
         printf("\nBloque Nuevo:\n");
         nuevo = capturaBloque(arrAtr, tamBloque, nAtr);
-        resp = existeBloqueDif(f, *entAct, arrAtr, nuevo, b, tamBloque);
+        resp = existeBloqueDif(f, *entAct, arrAtr,  nuevo,b, tamBloque);
         printf("\n respuesta %ld\n", resp);
 
         if( resp == -1)
@@ -1261,11 +1261,12 @@ void consultaBloque(FILE *f, Entidad entAct, Atributo *arrAtr, int nAtr, void* b
 {
     long des = sizeof(long);
     long cab = entAct.data;
+    int i;
 
     printf("\n--------------------------------------------------- BLOQUES ---------------------------------------------------\n");
     printf("Entidad activa: %s\n\n", entAct.nombre);
 
-    for (int i = 0; i < nAtr; ++i)
+    for (i = 0; i < nAtr; ++i)
         printf("%s\t\t", arrAtr[i].nombre);
 
     printf("\n");
@@ -1275,7 +1276,7 @@ void consultaBloque(FILE *f, Entidad entAct, Atributo *arrAtr, int nAtr, void* b
         des = sizeof(long);
         b = leeBloque(f, cab, tamBloque);
 
-        for (int i = 0; i < nAtr; ++i)
+        for (i = 0; i < nAtr; ++i)
         {
             switch (arrAtr[i].tipo)
             {
@@ -1326,47 +1327,47 @@ void* capturaBloqueClave(Atributo *arrAtr, long tamBloque, int nAtr)
     *((long*)p+0) = (long) - 1;
     long des = sizeof(long);
 
-        printf("Ingrese el/la %s del bloque que deseas eliminar:", arrAtr[0].nombre);
+    printf("Ingrese el/la %s del bloque que deseas eliminar:", arrAtr[0].nombre);
 
-        switch (arrAtr[0].tipo)
+    switch (arrAtr[0].tipo)
+    {
+        case 1:
         {
-            case 1:
-            {
-                char cad[500];
-                fflush(stdin);
-                scanf("%s", cad);
-                cad[arrAtr[0].tam - 1] = '\0';
-                strcpy((char *)(p+des),cad);
-                break;
-            }
-            case 2:
-            {
-                int entero;
-                scanf("%d", &entero);
-                *((int*)(p+des)) = entero;
-                break;
-            }
-            case 3:
-            {
-                float flotante;
-                scanf("%f", &flotante);
-                *((float*)(p+des)) = flotante;
-                break;
-            }
-            case 4:
-            {
-                double doble;
-                scanf("%lf", &doble);
-                *(double*)(p+des) = doble;
-                break;
-            }
-            case 5:
-            {
-                long largo;
-                scanf("%ld", &largo);
-                *((long*)(p+des)) = largo;
-                break;
-            }
+            char cad[500];
+            fflush(stdin);
+            scanf("%s", cad);
+            cad[arrAtr[0].tam - 1] = '\0';
+            strcpy((char *)(p+des),cad);
+            break;
         }
+        case 2:
+        {
+            int entero;
+            scanf("%d", &entero);
+            *((int*)(p+des)) = entero;
+            break;
+        }
+        case 3:
+        {
+            float flotante;
+            scanf("%f", &flotante);
+            *((float*)(p+des)) = flotante;
+            break;
+        }
+        case 4:
+        {
+            double doble;
+            scanf("%lf", &doble);
+            *(double*)(p+des) = doble;
+            break;
+        }
+        case 5:
+        {
+            long largo;
+            scanf("%ld", &largo);
+            *((long*)(p+des)) = largo;
+            break;
+        }
+    }
     return p;
 }

@@ -232,7 +232,6 @@ void menuEntidades(FILE *f)
                 if(existeISKP(f, entAct) == true)
                 {
                     tamBloque = cargaAtributos(f, entAct, arrAtr, &nAtr);
-                    printf("\n%ld\n", tamBloque);
                     menuBloques(f, entAct, direntAct, arrAtr, nAtr, b, tamBloque);
                 }
                 break;
@@ -458,11 +457,10 @@ void modificaEntidad(FILE *f)
     if(buscaEntidad(f, nombEnt) != -1)
     {
         printf("\nNueva Entidad\n");
-        pideNomEnt(nombEntNueva);
+        nuevaEnt = capturaEntidad();
 
-        if(buscaEntidad(f, nombEntNueva) == -1)
+        if(buscaEntidad(f, nuevaEnt.nombre) == -1)
         {
-            nuevaEnt = capturaEntidad();
             dir = eliminaEntidad(f, nombEnt);
             strcpy(nombEnt, nombEntNueva);
             reescribeEntidad(f, nuevaEnt, dir);
@@ -591,7 +589,8 @@ Atributo capturaAtributo()
     scanf(" %c", &nuevoAtributo.iskp);
 
     printf("Ingrese la descripcion del atributo:");
-    scanf("%s", nuevoAtributo.descripcion);
+    fflush(stdin);
+    fgets(nuevoAtributo.descripcion, sizeof(cadena), stdin);
 
     nuevoAtributo.sig = -1;
 
@@ -760,10 +759,12 @@ void modificaAtributo(FILE *f, Entidad *entAct, long direntAct)
     cadena nombAtr;
     long dirAtr;
 
+    printf("\nNombre del atributo que desea modificar\n");
     pideNombAtr(nombAtr);
 
     if(buscaAtributo(f, nombAtr, *entAct) != -1)
     {
+        printf("\nNuevo atributo\n");
         nuevoAtr = capturaAtributo();
 
         if(buscaAtributo(f, nuevoAtr.nombre, *entAct) == -1)
@@ -1139,14 +1140,19 @@ long existeBloqueDif(FILE *f, Entidad entAct, Atributo *arrAtr, void* b, void* b
 {
     long cab;
     void* data;
+    long des = sizeof(long);
     cab = entAct.data;
 
     while(cab != -1)
     {
         data = leeBloque(f, cab, tamBloque);
 
-        if(comparaBloques(arrAtr, data, b) ==0 )
+        printf("\nclave %d\n", *((int*)(data+des)));
+
+        if(comparaBloques(arrAtr, data, b) == 0 )
         {
+            printf("\nclave %d\n", *((int*)(b+des)));
+            printf("\nclave %d\n", *((int*)(bMod+des)));
             if(comparaBloques(arrAtr, data,bMod) == 0)
             {
                 free(data);
@@ -1157,12 +1163,14 @@ long existeBloqueDif(FILE *f, Entidad entAct, Atributo *arrAtr, void* b, void* b
         }
         cab = *((long*)data);
     }
+    return -1;
 }
 
 void modificaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, int nAtr,  long tamBloque)
 {
     long dir;
     void *b, *nuevo;
+    long resp;
 
     b = capturaBloqueClave(arrAtr, tamBloque, nAtr);
 
@@ -1170,8 +1178,10 @@ void modificaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, 
     {
         printf("\nBloque Nuevo:\n");
         nuevo = capturaBloque(arrAtr, tamBloque, nAtr);
+        resp = existeBloqueDif(f, *entAct, arrAtr, nuevo, b, tamBloque);
+        printf("\n respuesta %ld\n", resp);
 
-        if(existeBloqueDif(f, *entAct, arrAtr, nuevo, b, tamBloque) != -1)
+        if( resp == -1)
         {
             dir = eliminaBloque(f, entAct, direntAct, arrAtr, b, tamBloque);
             reescribeBloque(f, nuevo, dir, tamBloque);
