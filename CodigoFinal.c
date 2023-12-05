@@ -1147,12 +1147,12 @@ long existeBloqueDif(FILE *f, Entidad entAct, Atributo *arrAtr, void* b, void* b
     {
         data = leeBloque(f, cab, tamBloque);
 
-        printf("\nclave %d\n", *((int*)(data+des)));
+        //printf("\nclave %d\n", *((int*)(data+des)));
 
         if(comparaBloques(arrAtr, data, b) == 0 )
         {
-            printf("\nclave %d\n", *((int*)(b+des)));
-            printf("\nclave %d\n", *((int*)(bMod+des)));
+            //printf("\nclave %d\n", *((int*)(b+des)));
+            //printf("\nclave %d\n", *((int*)(bMod+des)));
             if(comparaBloques(arrAtr, data,bMod) == 0)
             {
                 free(data);
@@ -1179,7 +1179,7 @@ void modificaBloque(FILE *f, Entidad *entAct, long direntAct, Atributo *arrAtr, 
         printf("\nBloque Nuevo:\n");
         nuevo = capturaBloque(arrAtr, tamBloque, nAtr);
         resp = existeBloqueDif(f, *entAct, arrAtr, nuevo, b, tamBloque);
-        printf("\n respuesta %ld\n", resp);
+        //printf("\n respuesta %ld\n", resp);
 
         if( resp == -1)
         {
@@ -1326,7 +1326,7 @@ void* capturaBloqueClave(Atributo *arrAtr, long tamBloque, int nAtr)
     *((long*)p+0) = (long) - 1;
     long des = sizeof(long);
 
-        printf("Ingrese el/la %s del bloque que deseas eliminar:", arrAtr[0].nombre);
+        printf("\nBloque que desea modificar:\n", arrAtr[0].nombre);
 
         switch (arrAtr[0].tipo)
         {

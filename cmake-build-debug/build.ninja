@@ -49,8 +49,8 @@ cmake_ninja_workdir = C$:/Users/andre/Desktop/UNIVERSIDAD/Semestre$ 5/Lenguajes$
 
 build cmake_object_order_depends_target_Proyecto_Final: phony || CMakeFiles/Proyecto_Final.dir
 
-build CMakeFiles/Proyecto_Final.dir/Prueba.c.obj: C_COMPILER__Proyecto_Final_Debug C$:/Users/andre/Desktop/UNIVERSIDAD/Semestre$ 5/Lenguajes$ de$ Programacion/Proyecto$ Final/Prueba.c || cmake_object_order_depends_target_Proyecto_Final
-  DEP_FILE = CMakeFiles\Proyecto_Final.dir\Prueba.c.obj.d
+build CMakeFiles/Proyecto_Final.dir/CodigoFinal.c.obj: C_COMPILER__Proyecto_Final_Debug C$:/Users/andre/Desktop/UNIVERSIDAD/Semestre$ 5/Lenguajes$ de$ Programacion/Proyecto$ Final/CodigoFinal.c || cmake_object_order_depends_target_Proyecto_Final
+  DEP_FILE = CMakeFiles\Proyecto_Final.dir\CodigoFinal.c.obj.d
   FLAGS = -g -std=gnu99
   OBJECT_DIR = CMakeFiles\Proyecto_Final.dir
   OBJECT_FILE_DIR = CMakeFiles\Proyecto_Final.dir
@@ -63,7 +63,7 @@ build CMakeFiles/Proyecto_Final.dir/Prueba.c.obj: C_COMPILER__Proyecto_Final_Deb
 #############################################
 # Link the executable Proyecto_Final.exe
 
-build Proyecto_Final.exe: C_EXECUTABLE_LINKER__Proyecto_Final_Debug CMakeFiles/Proyecto_Final.dir/Prueba.c.obj
+build Proyecto_Final.exe: C_EXECUTABLE_LINKER__Proyecto_Final_Debug CMakeFiles/Proyecto_Final.dir/CodigoFinal.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\Proyecto_Final.dir

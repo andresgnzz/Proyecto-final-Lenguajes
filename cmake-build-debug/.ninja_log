@@ -1,11 +1,10 @@
 # ninja log v5
 3	139	7220499422200843	CMakeFiles/Proyecto_Final.dir/main.c.obj	38c55fb51b6c9fa1
-163	277	7234948732246734	Proyecto_Final.exe	9933d0bf7cb07783
+201	317	7234959097316387	Proyecto_Final.exe	13f0ba5efe575d34
 4	163	7234948731149240	CMakeFiles/Proyecto_Final.dir/CodigoFinal.c.obj	2f019bc39871b758
 4	200	7228933346645085	CMakeFiles/Proyecto_Final.dir/CodigoReplit.c.obj	6ee64dbda311a47e
-1	230	7234954336517311	CMakeFiles/Proyecto_Final.dir/Prueba.c.obj	3277ab7d803f8cdb
-232	541	7234954339181021	Proyecto_Final.exe	13f0ba5efe575d34
-2	188	7234958595712402	CMakeFiles/Proyecto_Final.dir/Prueba.c.obj	3277ab7d803f8cdb
-188	329	7234958597122051	Proyecto_Final.exe	13f0ba5efe575d34
 2	201	7234959096218872	CMakeFiles/Proyecto_Final.dir/Prueba.c.obj	3277ab7d803f8cdb
-201	317	7234959097316387	Proyecto_Final.exe	13f0ba5efe575d34
+0	237	7234988026426725	CMakeFiles/Proyecto_Final.dir/CodigoFinal.c.obj	2f019bc39871b758
+238	381	7234988027657428	Proyecto_Final.exe	9933d0bf7cb07783
+16	266	7234996129470582	CMakeFiles/Proyecto_Final.dir/CodigoFinal.c.obj	2f019bc39871b758
+267	436	7234996131093206	Proyecto_Final.exe	9933d0bf7cb07783
