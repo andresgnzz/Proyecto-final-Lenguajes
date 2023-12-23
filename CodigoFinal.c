@@ -232,8 +232,6 @@ void menuEntidades(FILE *f)
                 break;
             case 5:
                 seleccionaTabla(f, &entAct, &direntAct);
-                printf("\nApuntador atr: %ld", entAct.atr);
-                printf("\nDireccion entAct: %ld", direntAct);
                 menuAtributos(f, entAct, direntAct);
             case 6:
                 seleccionaTabla(f, &entAct, &direntAct);
